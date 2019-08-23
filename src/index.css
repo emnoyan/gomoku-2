@@ -7,7 +7,29 @@ ol, ul {
   padding-left: 30px;
 }
 
+.wrapper {
+  position: relative;
+}
+
+.squares {
+  margin-left:34px;
+  margin-top:34px;
+  margin-right:34px;
+}
+
+.nodes {
+  position: absolute;
+  top: -17px;
+  left: 17px;
+}
+
 .board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.node-row:after {
   clear: both;
   content: "";
   display: table;
@@ -18,18 +40,13 @@ ol, ul {
 }
 
 .node {
-  background: #fff;
-  border: 1px solid #999;
+  background: None;
+  border: None;
   float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
+  height: 36px;
   margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  width: 34px;
+  margin-bottom: -1px;
+  width: 36px;
   border-radius: 50%;
 }
 
@@ -38,7 +55,7 @@ ol, ul {
 }
 
 .square {
-  background: #fff;
+  background: #FFFFE0;
   border: 1px solid #999;
   float: left;
   font-size: 24px;
