@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 // function component since it doesn not require a state
-function Node(props) {
+function Stone(props) {
   const outline = props.value ? '1px solid black' : 'None';
   return (
     <button 
-      className="node" 
+      className="stone" 
       onClick={props.onClick} 
       style={{background: props.value, border: outline}}>
     </button>
@@ -21,19 +21,19 @@ class Board extends React.Component {
     );
   }
 
-  renderNode(i) {
+  renderStone(i, j) {
     return (
-      <Node
-        value={this.props.nodes[i]} 
-        onClick={() => this.props.onClick(i)}
-        key={i}
+      <Stone
+        value={this.props.nodes[i][j].stone} 
+        onClick={() => this.props.onClick(i, j)}
+        key={i * this.props.nodes.length + j}
       />
     );
   }
 
   // each of the physical squares on the board
   boardRender() {
-    const sideLen = Math.sqrt(this.props.nodes.length) - 1;
+    const sideLen = this.props.nodes.length - 1;
     let board = [];
     for(let i = 0; i < sideLen; i++){
       // need to create individual nodes (children) first
@@ -47,27 +47,25 @@ class Board extends React.Component {
   }
 
   // each of the buttons
-  nodeRender() {
-    const numNodes = this.props.nodes.length;
-    const sideLen = Math.sqrt(numNodes);
-    let nodeBoard = [];
+  stoneRender() {
+    const sideLen = this.props.nodes.length;
+    let stoneBoard = [];
     for(let i = 0; i < sideLen; i++){
       // need to create individual nodes (children) first
       let children = [];
       for(let j = 0; j < sideLen; j++) {
-        children.push(this.renderNode(i * sideLen + j));
+        children.push(this.renderStone(i, j));
       }
-      nodeBoard.push(<div className="node-row" key={i}>{children}</div>)
+      stoneBoard.push(<div className="stone-row" key={i}>{children}</div>)
     }
-    return nodeBoard;
+    return stoneBoard;
   }
 
   render() {
     return (
       <div className="wrapper"> 
         <div className="squares">{this.boardRender()}</div>
-        <div className="nodes">{this.nodeRender()}</div> 
-
+        <div className="stones">{this.stoneRender()}</div> 
       </div>
     );
   }
@@ -76,24 +74,51 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    // each node should be contain a stone and neighbors array
+    // we must declare this way because of unexpected behavior when declaring
+    // 2D arrays with fill()
+    const board = Array();
+    for(let i = 0; i < this.props.size; i++) {
+      board[i] = Array(this.props.size).fill().map(x => ({
+        stone: null,
+        neighbors: Array(8).fill(null),
+      }))
+    }
     this.state = {
       history: [{
-        nodes: Array(this.props.size**2).fill(null),
+        nodes: board,
       }],
       stepNumber: 0,
       blackIsNext: true,
     };
   }
 
-  handleClick(i) {
+  // function to update a node's neighors upon click
+  updateNeighbors(i) {
+    // neighbors are of the form
+    // [0, 1, 2
+    //  3,  , 4
+    //  5, 6, 7]
+    i.neighbors.forEach((d, i) => {
+      console.log(i);
+    })
+
+  }
+
+  handleClick(i, j) {
+    console.log('inside handleClick');
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const nodes = current.nodes.slice(); // creates copy of array
+    console.log(nodes);
     // check if click is valid
-    if (calculateWinner(nodes) || nodes[i]) {
+    if (nodes[i][j].stone) {
       return;
     }
-    nodes[i] = this.state.blackIsNext ? 'black' : 'white';
+    nodes[i][j].stone = this.state.blackIsNext ? 'black' : 'white';
+    // update the neighbors nodes
+    // this.updateNeighbors(nodes[i]);
+    // set the new state
     this.setState({
       history: history.concat([{
         nodes: nodes,
@@ -113,14 +138,15 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.nodes);
+    // const winner = calculateWinner(current.nodes);
 
     let status;
-    if (winner) {
-      status = winner + " has won!";
-    } else {
-      status = 'Next player: ' + (this.state.blackIsNext ? 'black' : 'white');
-    }
+    status = "placeholder";
+    // if (winner) {
+    //   status = winner + " has won!";
+    // } else {
+    //   status = 'Next player: ' + (this.state.blackIsNext ? 'black' : 'white');
+    // }
 
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -138,7 +164,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board 
             nodes={current.nodes}
-            onClick={(i)=>this.handleClick(i)}
+            onClick={(i, j)=>this.handleClick(i, j)}
           />
         </div>
         <div className="game-info">
@@ -151,6 +177,8 @@ class Game extends React.Component {
 }
 
 function calculateWinner(nodes) {
+  // const numNodes = nodes.length;
+  // const sideLen = Math.sqrt(numNodes);
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -173,6 +201,6 @@ function calculateWinner(nodes) {
 // ========================================
 
 ReactDOM.render(
-  <Game size={13}/>,
+  <Game size={9}/>,
   document.getElementById('root')
 );

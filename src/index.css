@@ -17,7 +17,7 @@ ol, ul {
   margin-right:34px;
 }
 
-.nodes {
+.stones {
   position: absolute;
   top: -17px;
   left: 17px;
@@ -29,7 +29,7 @@ ol, ul {
   display: table;
 }
 
-.node-row:after {
+.stone-row:after {
   clear: both;
   content: "";
   display: table;
@@ -39,7 +39,7 @@ ol, ul {
   margin-bottom: 10px;
 }
 
-.node {
+.stone {
   background: None;
   border: None;
   float: left;
@@ -50,7 +50,7 @@ ol, ul {
   border-radius: 50%;
 }
 
-.node:focus {
+.stone:focus {
   outline: none;
 }
 
