@@ -106,11 +106,10 @@ class Game extends React.Component {
   }
 
   handleClick(i, j) {
-    console.log('inside handleClick');
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
-    const nodes = current.nodes.slice(); // creates copy of array
-    console.log(nodes);
+    // create a DEEP copy of the array (.slice does not copy internal objects)
+    const nodes = JSON.parse(JSON.stringify(current.nodes))
     // check if click is valid
     if (nodes[i][j].stone) {
       return;
