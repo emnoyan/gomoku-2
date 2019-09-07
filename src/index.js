@@ -101,8 +101,8 @@ class Game extends React.Component {
               return null;
             }
           }
-          // if the above conditions are not satisfied, the neighbor exists
-          return 0;
+          // if the above conditions not satisfied, the neighbor is on the board
+          return 'empty';
         }),
       }))
     }
@@ -116,15 +116,30 @@ class Game extends React.Component {
   }
 
   // function to update a node's neighors upon click
-  updateNeighbors(i) {
+  updateNeighbors(nodes, i, j) {
     // neighbors are of the form
     // [0, 1, 2
     //  3,  , 4
     //  5, 6, 7]
-    i.neighbors.forEach((d, i) => {
-      console.log(i);
+    let neighbor;
+    nodes[i][j].neighbors.forEach((d, index) => {
+      if (d) {
+        if (index < 3) {
+          neighbor = nodes[i-1][j+index-1]
+        } else if (index === 3) {
+          neighbor = nodes[i][j-1]
+        } else if (index === 4) {
+          neighbor = nodes[i][j+1]
+        } else if (index > 4) {
+          neighbor = nodes[i+1][j+index-6]
+        }
+      }
+      if (d) {
+        // javascript equivalent of neighbors[-index] in python
+        neighbor.neighbors[nodes[i][j].neighbors.length-1-index] = 
+          this.state.blackIsNext ? 'black' : 'white';
+      }
     })
-
   }
 
   handleClick(i, j) {
@@ -138,7 +153,7 @@ class Game extends React.Component {
     }
     nodes[i][j].stone = this.state.blackIsNext ? 'black' : 'white';
     // update the neighbors nodes
-    // this.updateNeighbors(nodes[i]);
+    this.updateNeighbors(nodes, i, j);
     // set the new state
     this.setState({
       history: history.concat([{
