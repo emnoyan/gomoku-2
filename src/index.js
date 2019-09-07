@@ -112,6 +112,7 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       blackIsNext: true,
+      winner: null,
     };
   }
 
@@ -142,25 +143,73 @@ class Game extends React.Component {
     })
   }
 
+  // function to check if someone has won upon click
+  checkWinner(nodes, i, j) {
+    // neighbors are of the form
+    // [0, 1, 2
+    //  3,  , 4
+    //  5, 6, 7]
+    let k;
+    let result = null;
+    nodes[i][j].neighbors.forEach((d, index) => {
+      if (d && d === nodes[i][j].stone && !result) {
+        let x = i;
+        let y = j;
+        let dx;
+        let dy;
+        if (index < 3) {
+          dx = -1;
+          dy = index-1;
+        } else if (index === 3) {
+          dx = 0;
+          dy = -1;
+        } else if (index === 4) {
+          dx = 0;
+          dy = 1;
+        } else if (index > 4) {
+          dx = 1;
+          dy = index - 6;
+        }
+        // see if there are five of the same in a row in this direction
+        for (k = 0; k < 4; k++) {
+          if (nodes[x][y].neighbors[index] && 
+              nodes[x][y].neighbors[index] === nodes[i][j].stone) {
+            x = x + dx;
+            y = y + dy;
+          } else {
+            break;
+          }
+        }
+        if (k === 4) {
+          result = nodes[i][j].stone;
+        }
+      }   
+    })
+    return result;
+  }
+
   handleClick(i, j) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     // create a DEEP copy of the array (.slice does not copy internal objects)
     const nodes = JSON.parse(JSON.stringify(current.nodes))
     // check if click is valid
-    if (nodes[i][j].stone) {
+    if (nodes[i][j].stone || this.state.winner) {
       return;
     }
     nodes[i][j].stone = this.state.blackIsNext ? 'black' : 'white';
     // update the neighbors nodes
     this.updateNeighbors(nodes, i, j);
+    // now check if there is a winner
+    const winner = this.checkWinner(nodes, i, j);
     // set the new state
     this.setState({
       history: history.concat([{
         nodes: nodes,
       }]),  
       stepNumber: history.length,
-      blackIsNext: !this.state.blackIsNext
+      blackIsNext: !this.state.blackIsNext,
+      winner: winner
     });
   }
 
@@ -168,22 +217,23 @@ class Game extends React.Component {
     this.setState({
       stepNumber: step,
       blackIsNext: (step % 2) === 0,
+      winner: null,
     });
   }
 
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    console.log(current.nodes)
+    const winner = this.state.winner;
     // const winner = calculateWinner(current.nodes);
 
     let status;
     status = "placeholder";
-    // if (winner) {
-    //   status = winner + " has won!";
-    // } else {
-    //   status = 'Next player: ' + (this.state.blackIsNext ? 'black' : 'white');
-    // }
+    if (winner) {
+      status = winner + " has won!";
+    } else {
+      status = 'Next player: ' + (this.state.blackIsNext ? 'black' : 'white');
+    }
 
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -238,6 +288,6 @@ function calculateWinner(nodes) {
 // ========================================
 
 ReactDOM.render(
-  <Game size={13}/>,
+  <Game size={9}/>,
   document.getElementById('root')
 );
