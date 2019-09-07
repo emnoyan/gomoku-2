@@ -1,4 +1,4 @@
 Gomoku Implementation with AI
 
-This project is in progress, finished GUI, wrapping up game logic, and beginning work on a simple AI based on the AlphaZero framework.
+In progress, finished GUI and game logic, and working on a simple AI based on the AlphaZero framework.
 
