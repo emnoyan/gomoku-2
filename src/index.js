@@ -77,11 +77,33 @@ class Game extends React.Component {
     // each node should be contain a stone and neighbors array
     // we must declare this way because of unexpected behavior when declaring
     // 2D arrays with fill()
-    const board = Array();
+    const board = [];
     for(let i = 0; i < this.props.size; i++) {
-      board[i] = Array(this.props.size).fill().map(x => ({
+      board[i] = Array(this.props.size).fill().map((x, j) => ({
         stone: null,
-        neighbors: Array(8).fill(null),
+        // define each stones set of neighbors based on position
+        neighbors: Array(8).fill().map((neighbor, k) => {
+          if (i === 0) {
+            if (k < 3) {
+              return null;
+            }
+          } else if (i === this.props.size - 1) {
+            if (k > 4) {
+              return null;
+            }
+          } 
+          if (j === 0) {
+            if (k === 0 || k === 3 || k === 5) {
+              return null;
+            }
+          } else if (j === this.props.size - 1) {
+            if (k === 2 || k === 4 || k === 7) {
+              return null;
+            }
+          }
+          // if the above conditions are not satisfied, the neighbor exists
+          return 0;
+        }),
       }))
     }
     this.state = {
@@ -137,6 +159,7 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
+    console.log(current.nodes)
     // const winner = calculateWinner(current.nodes);
 
     let status;
@@ -200,6 +223,6 @@ function calculateWinner(nodes) {
 // ========================================
 
 ReactDOM.render(
-  <Game size={9}/>,
+  <Game size={13}/>,
   document.getElementById('root')
 );
